@@ -22,6 +22,7 @@ Imports DevExpress.XtraBars.Navigation
 Imports combera.dortmund.transfertools
 Imports DevExpress.XtraPivotGrid
 Imports DevExpress
+Imports Ionic.Zip
 
 Public Class frmMain
 
@@ -673,5 +674,59 @@ Public Class frmMain
     End Sub
     Private Sub bbiExit_ItemClick(sender As Object, e As XtraBars.ItemClickEventArgs) Handles bbiExit.ItemClick
         End
+    End Sub
+
+    Private Sub bbiZipFotosAndCopy_ItemClick(sender As Object, e As XtraBars.ItemClickEventArgs) Handles bbiZipFotosAndCopy.ItemClick
+
+        Dim AktDate As Date = Date.Today
+        Dim AktMonat As Int32 = AktDate.Month
+        Dim AktJahr As Int32 = AktDate.Year
+        Dim AuswertungsMonat As Int32 = 0
+        Dim AuswertungsJahr As Int32 = 0
+        Dim txtWebFolder As String = My.Settings.web_foto_zip_folder
+        Dim txtSrcFolder As String = My.Settings.DestinationFolder
+
+        If Not txtWebFolder.EndsWith("\") Then
+            txtWebFolder = txtWebFolder & "\"
+        End If
+
+        If AktMonat = 1 Then
+            AuswertungsMonat = 12
+            AuswertungsJahr = AktJahr - 1
+        Else
+            AuswertungsMonat = AktMonat - 1
+            AuswertungsJahr = AktJahr
+        End If
+
+        '\\dmfs04\all\Adelholzener\2020\06
+        If Not txtSrcFolder.EndsWith("\") Then
+            txtSrcFolder = txtSrcFolder & "\"
+        End If
+
+        txtSrcFolder = txtSrcFolder & AuswertungsJahr & "\"
+        txtSrcFolder = txtSrcFolder & AuswertungsMonat.ToString("00") & "\"
+
+
+        Dim txtDtmFilter As String = ""
+        txtDtmFilter = String.Format("{0}.{1:00}", AuswertungsJahr, AuswertungsMonat)
+        tAuswertungsZeitraum = txtDtmFilter
+
+        Dim args As New XtraMessageBoxArgs()
+        args.Caption = "Export Pivot"
+        args.Text = "Was soll ausgewertet werden?"
+        args.Buttons = New DialogResult() {DialogResult.OK, DialogResult.Cancel, DialogResult.Retry}
+        AddHandler args.Showing, AddressOf Args_Showing
+
+
+        Dim oResult As DialogResult = XtraMessageBox.Show(args)
+
+        If oResult = DialogResult.Retry Then
+            Using oZip As ZipFile = New ZipFile
+                oZip.AddDirectory(txtSrcFolder, "")
+                oZip.Save(txtWebFolder & AuswertungsMonat.ToString("00") & ".zip")
+            End Using
+            MsgBox(txtWebFolder & AuswertungsMonat.ToString("00") & ".zip created sucessfully!", vbInformation + vbOKOnly, "ZIP files and copy")
+        End If
+
     End Sub
 End Class

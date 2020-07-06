@@ -17,5 +17,8 @@
     <Setting Name="DestinationFolder4POSI" Type="System.String" Scope="User">
       <Value Profile="(Default)">\\dmfs01\POS-Sales_Programme\Fotos_Temp\</Value>
     </Setting>
+    <Setting Name="web_foto_zip_folder" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">\\dmweb03\Adelholzener\Auswertungen\Fotos\</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

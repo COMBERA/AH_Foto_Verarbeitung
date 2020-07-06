@@ -27,9 +27,11 @@ Partial Class frmMain
         Me.pgbMain = New DevExpress.XtraEditors.Repository.RepositoryItemProgressBar()
         Me.bbiExportPivot = New DevExpress.XtraBars.BarButtonItem()
         Me.bbiExportRohdaten = New DevExpress.XtraBars.BarButtonItem()
+        Me.bbiZipFotosAndCopy = New DevExpress.XtraBars.BarButtonItem()
         Me.drpStart = New DevExpress.XtraBars.Ribbon.RibbonPage()
         Me.rpgMain = New DevExpress.XtraBars.Ribbon.RibbonPageGroup()
         Me.rpgExport = New DevExpress.XtraBars.Ribbon.RibbonPageGroup()
+        Me.rpgFiles = New DevExpress.XtraBars.Ribbon.RibbonPageGroup()
         Me.RepositoryItemProgressBar1 = New DevExpress.XtraEditors.Repository.RepositoryItemProgressBar()
         Me.RibbonStatusBar = New DevExpress.XtraBars.Ribbon.RibbonStatusBar()
         Me.dtpMain = New DevExpress.XtraBars.Navigation.TabPane()
@@ -66,14 +68,14 @@ Partial Class frmMain
         'RibbonControl
         '
         Me.RibbonControl.ExpandCollapseItem.Id = 0
-        Me.RibbonControl.Items.AddRange(New DevExpress.XtraBars.BarItem() {Me.RibbonControl.ExpandCollapseItem, Me.bbiExit, Me.bsiFotos2Copy, Me.pgbMainItem, Me.bbiExportPivot, Me.bbiExportRohdaten})
+        Me.RibbonControl.Items.AddRange(New DevExpress.XtraBars.BarItem() {Me.RibbonControl.ExpandCollapseItem, Me.RibbonControl.SearchEditItem, Me.bbiExit, Me.bsiFotos2Copy, Me.pgbMainItem, Me.bbiExportPivot, Me.bbiExportRohdaten, Me.bbiZipFotosAndCopy})
         Me.RibbonControl.Location = New System.Drawing.Point(0, 0)
-        Me.RibbonControl.MaxItemId = 6
+        Me.RibbonControl.MaxItemId = 7
         Me.RibbonControl.Name = "RibbonControl"
         Me.RibbonControl.Pages.AddRange(New DevExpress.XtraBars.Ribbon.RibbonPage() {Me.drpStart})
         Me.RibbonControl.RepositoryItems.AddRange(New DevExpress.XtraEditors.Repository.RepositoryItem() {Me.RepositoryItemProgressBar1, Me.pgbMain})
         Me.RibbonControl.RibbonStyle = DevExpress.XtraBars.Ribbon.RibbonControlStyle.Office2013
-        Me.RibbonControl.Size = New System.Drawing.Size(1090, 143)
+        Me.RibbonControl.Size = New System.Drawing.Size(1090, 158)
         Me.RibbonControl.StatusBar = Me.RibbonStatusBar
         '
         'bbiExit
@@ -89,7 +91,6 @@ Partial Class frmMain
         Me.bsiFotos2Copy.Caption = "BarStaticItem1"
         Me.bsiFotos2Copy.Id = 2
         Me.bsiFotos2Copy.Name = "bsiFotos2Copy"
-        Me.bsiFotos2Copy.TextAlignment = System.Drawing.StringAlignment.Near
         '
         'pgbMainItem
         '
@@ -120,9 +121,17 @@ Partial Class frmMain
         Me.bbiExportRohdaten.ImageOptions.LargeImage = CType(resources.GetObject("bbiExportRohdaten.ImageOptions.LargeImage"), System.Drawing.Image)
         Me.bbiExportRohdaten.Name = "bbiExportRohdaten"
         '
+        'bbiZipFotosAndCopy
+        '
+        Me.bbiZipFotosAndCopy.Caption = "Copy Zip Files"
+        Me.bbiZipFotosAndCopy.Id = 6
+        Me.bbiZipFotosAndCopy.ImageOptions.Image = Global.AH_Foto_Verarbeitung.My.Resources.Resources.File_Zip_Rar_Archive_icon_32
+        Me.bbiZipFotosAndCopy.ImageOptions.LargeImage = Global.AH_Foto_Verarbeitung.My.Resources.Resources.File_Zip_Rar_Archive_icon_32
+        Me.bbiZipFotosAndCopy.Name = "bbiZipFotosAndCopy"
+        '
         'drpStart
         '
-        Me.drpStart.Groups.AddRange(New DevExpress.XtraBars.Ribbon.RibbonPageGroup() {Me.rpgMain, Me.rpgExport})
+        Me.drpStart.Groups.AddRange(New DevExpress.XtraBars.Ribbon.RibbonPageGroup() {Me.rpgMain, Me.rpgExport, Me.rpgFiles})
         Me.drpStart.Name = "drpStart"
         Me.drpStart.Text = "Start"
         '
@@ -139,6 +148,12 @@ Partial Class frmMain
         Me.rpgExport.Name = "rpgExport"
         Me.rpgExport.Text = "Export"
         '
+        'rpgFiles
+        '
+        Me.rpgFiles.ItemLinks.Add(Me.bbiZipFotosAndCopy)
+        Me.rpgFiles.Name = "rpgFiles"
+        Me.rpgFiles.Text = "Files"
+        '
         'RepositoryItemProgressBar1
         '
         Me.RepositoryItemProgressBar1.Name = "RepositoryItemProgressBar1"
@@ -149,10 +164,10 @@ Partial Class frmMain
         '
         Me.RibbonStatusBar.ItemLinks.Add(Me.bsiFotos2Copy)
         Me.RibbonStatusBar.ItemLinks.Add(Me.pgbMainItem)
-        Me.RibbonStatusBar.Location = New System.Drawing.Point(0, 654)
+        Me.RibbonStatusBar.Location = New System.Drawing.Point(0, 661)
         Me.RibbonStatusBar.Name = "RibbonStatusBar"
         Me.RibbonStatusBar.Ribbon = Me.RibbonControl
-        Me.RibbonStatusBar.Size = New System.Drawing.Size(1090, 31)
+        Me.RibbonStatusBar.Size = New System.Drawing.Size(1090, 24)
         '
         'dtpMain
         '
@@ -164,12 +179,12 @@ Partial Class frmMain
         Me.dtpMain.Controls.Add(Me.dtpRohdaten)
         Me.dtpMain.Controls.Add(Me.dtpXLSX)
         Me.dtpMain.Controls.Add(Me.dtpLOG)
-        Me.dtpMain.Location = New System.Drawing.Point(0, 150)
+        Me.dtpMain.Location = New System.Drawing.Point(0, 161)
         Me.dtpMain.Name = "dtpMain"
         Me.dtpMain.Pages.AddRange(New DevExpress.XtraBars.Navigation.NavigationPageBase() {Me.dtpFotos2Copy, Me.dtpPivotExport, Me.dtpRohdaten, Me.dtpXLSX, Me.dtpLOG})
-        Me.dtpMain.RegularSize = New System.Drawing.Size(1090, 498)
+        Me.dtpMain.RegularSize = New System.Drawing.Size(1090, 494)
         Me.dtpMain.SelectedPage = Me.dtpPivotExport
-        Me.dtpMain.Size = New System.Drawing.Size(1090, 498)
+        Me.dtpMain.Size = New System.Drawing.Size(1090, 494)
         Me.dtpMain.TabIndex = 2
         Me.dtpMain.Text = "TabPane1"
         '
@@ -204,14 +219,14 @@ Partial Class frmMain
         Me.dtpPivotExport.Caption = "Pivot 2 Export"
         Me.dtpPivotExport.Controls.Add(Me.dpgExport)
         Me.dtpPivotExport.Name = "dtpPivotExport"
-        Me.dtpPivotExport.Size = New System.Drawing.Size(1090, 498)
+        Me.dtpPivotExport.Size = New System.Drawing.Size(1090, 465)
         '
         'dpgExport
         '
         Me.dpgExport.Dock = System.Windows.Forms.DockStyle.Fill
         Me.dpgExport.Location = New System.Drawing.Point(0, 0)
         Me.dpgExport.Name = "dpgExport"
-        Me.dpgExport.Size = New System.Drawing.Size(1090, 498)
+        Me.dpgExport.Size = New System.Drawing.Size(1090, 465)
         Me.dpgExport.TabIndex = 5
         '
         'dtpRohdaten
@@ -279,7 +294,7 @@ Partial Class frmMain
         Me.Controls.Add(Me.dtpMain)
         Me.Controls.Add(Me.RibbonStatusBar)
         Me.Controls.Add(Me.RibbonControl)
-        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.IconOptions.Icon = CType(resources.GetObject("frmMain.IconOptions.Icon"), System.Drawing.Icon)
         Me.Name = "frmMain"
         Me.Ribbon = Me.RibbonControl
         Me.StatusBar = Me.RibbonStatusBar
@@ -331,4 +346,6 @@ Partial Class frmMain
     Friend WithEvents rpgExport As DevExpress.XtraBars.Ribbon.RibbonPageGroup
     Friend WithEvents UdcXLSXExport As udcXLSX
     Friend WithEvents bbiExportRohdaten As DevExpress.XtraBars.BarButtonItem
+    Friend WithEvents bbiZipFotosAndCopy As DevExpress.XtraBars.BarButtonItem
+    Friend WithEvents rpgFiles As DevExpress.XtraBars.Ribbon.RibbonPageGroup
 End Class
