@@ -19,10 +19,10 @@ Imports log4net
 Imports log4net.Config
 Imports DevExpress.Utils
 Imports DevExpress.XtraBars.Navigation
-Imports combera.dortmund.transfertools
 Imports DevExpress.XtraPivotGrid
 Imports DevExpress
 Imports Ionic.Zip
+
 
 Public Class frmMain
 
@@ -32,7 +32,7 @@ Public Class frmMain
     Private colFotos4Pivot As XPCollection(Of kunden.ah.adelholzener_exp_fotoauswertung_pivot_src)
     Private colFilesCreated As New System.Collections.ObjectModel.Collection(Of String)
 
-    Private oMailer As Mails
+
 
     Private MinDate As DateTime
     Private MaxDate As DateTime
@@ -41,6 +41,10 @@ Public Class frmMain
     Private IsAuto As Boolean = False
 
     Private tAuswertungsZeitraum As String = ""
+
+    Private oMailer As New cb.mailer.cb_mailer
+
+
 
     Private Sub Args_Showing(ByVal sender As Object, ByVal e As XtraMessageShowingArgs)
         For Each control In e.Form.Controls
@@ -115,7 +119,7 @@ Public Class frmMain
             txtSQL = " INSERT INTO Adelholzener.exp_fotoauswertung_pivot_src " +
                     " (id, adm_name, gebiet, besuchsdatum, besuchsdatum_auswertung, cid, schluessel, kategorie, copydate, jahr, monat) " +
                     " SELECT        ID, adm_name, gebiet, besuchsdatum, besuchsdatum_auswertung, cid, schluessel, kategorie, copydate, YEAR(besuchsdatum) AS jahr, MONTH(besuchsdatum) AS monat " +
-                    " FROM            Adelholzener.exp_foto_4_pivot_src "
+                    " FROM            Adelholzener.exp_foto_4_pivot_src WHERE YEAR(besuchsdatum) > 2020"
 
 
             InsertPivotData = oSession.ExecuteNonQuery(txtSQL)
@@ -505,21 +509,126 @@ Public Class frmMain
         End Try
 
     End Sub
+    Private Sub ExporFilteredtPivot()
+        Try
+            Dim AktDate As Date = Date.Today
+            Dim AktMonat As Int32 = AktDate.Month
+            Dim AktJahr As Int32 = AktDate.Year
+            Dim AuswertungsMonat As Int32 = 0
+            Dim AuswertungsJahr As Int32 = 0
+            Dim txtXLSFolder As String = My.Settings.ExcelFolder4Reports
+
+
+
+            If IsNothing(colFilesCreated) Then
+                colFilesCreated = New ObjectModel.Collection(Of String)
+            Else
+                colFilesCreated.Clear()
+            End If
+
+            If My.Computer.Name.ToLower = "lt-5195" Then
+                txtXLSFolder = "D:\"
+            End If
+            If Not txtXLSFolder.EndsWith("\") Then
+                txtXLSFolder = txtXLSFolder & "\"
+            End If
+            AddLogText("Ausgabefolder: " & txtXLSFolder)
+
+
+            Dim arrCO() As String = Me.dpgExport.ActiveFilterCriteria.LegacyToString.ToLower.Split("and")
+
+            For Each oField As DevExpress.XtraPivotGrid.PivotGridField In Me.dpgExport.Fields
+                If oField.FilterValues.Count = 1 Then
+                    Debug.Print(oField.FieldName.ToLower)
+                    If oField.FieldName.ToLower = "jahr" Then
+                        AuswertungsJahr = Convert.ToInt32(oField.FilterValues.Values(0))
+                    End If
+                    If oField.FieldName.ToLower = "monat" Then
+                        AuswertungsMonat = Convert.ToInt32(oField.FilterValues.Values(0))
+                    End If
+                End If
+            Next
+
+
+            Dim txtDtmFilter As String = ""
+            txtDtmFilter = String.Format("{0}.{1:00}", AuswertungsJahr, AuswertungsMonat)
+            AddLogText("Filter für Export: " & txtDtmFilter)
+
+            tAuswertungsZeitraum = txtDtmFilter
+
+            Dim args As New XtraMessageBoxArgs()
+            args.Caption = "Export Pivot"
+            args.Text = "Was soll ausgewertet werden?"
+            args.Buttons = New DialogResult() {DialogResult.OK, DialogResult.Cancel, DialogResult.Retry}
+            AddHandler args.Showing, AddressOf Args_Showing
+
+
+            Dim oResult As DialogResult = XtraMessageBox.Show(args)
+
+            Dim txtFolder As String = ""
+            Dim o As New DevExpress.XtraPrinting.XlsxExportOptionsEx() With {.ExportType = DevExpress.Export.ExportType.WYSIWYG, .ExportMode = XtraPrinting.XlsxExportMode.SingleFile, .SheetName = "Jahr"}
+
+            If oResult = DialogResult.Retry Then
+
+
+                txtFolder = String.Format(txtXLSFolder & "Monatsuaswertung_Fotos_{0}.xlsx", tAuswertungsZeitraum)
+                Dim oFilterAktJahr As CriteriaOperator
+                oFilterAktJahr = GroupOperator.Combine(GroupOperatorType.And,
+                            New BinaryOperator("jahr", AuswertungsJahr, BinaryOperatorType.Equal),
+                            New BinaryOperator("monat", AuswertungsMonat, BinaryOperatorType.Equal))
+
+                colFotos4Pivot.Filter = oFilterAktJahr
+                Me.dtpRohdaten.Text = "Rohdaten (" & colFotos4Pivot.Count.ToString("#,##0") & ")"
+                Me.dpgExport.ExportToXlsx(txtFolder, o)
+                colFilesCreated.Add(txtFolder)
+                AddLogText("File created: " & txtFolder)
+                colFotos4Pivot.Filter = Nothing
+
+                o.SheetName = "Monat " & AuswertungsMonat.ToString("00")
+            End If
+
+            If oResult = DialogResult.OK Then
+
+
+                txtFolder = String.Format(txtXLSFolder & "Jahresauswertung_Fotos_{0}.xlsx", AuswertungsJahr)
+                Dim oFilterAktJahr As CriteriaOperator
+                oFilterAktJahr = GroupOperator.Combine(GroupOperatorType.And,
+                            New BinaryOperator("jahr", AuswertungsJahr, BinaryOperatorType.Equal),
+                            New BinaryOperator("monat", AuswertungsMonat, BinaryOperatorType.LessOrEqual))
+
+                colFotos4Pivot.Filter = oFilterAktJahr
+                Me.dtpRohdaten.Text = "Rohdaten (" & colFotos4Pivot.Count.ToString("#,##0") & ")"
+                Me.dpgExport.ExportToXlsx(txtFolder, o)
+                colFilesCreated.Add(txtFolder)
+                AddLogText("File created: " & txtFolder)
+                colFotos4Pivot.Filter = Nothing
+
+                o.SheetName = "Monat " & AuswertungsMonat.ToString("00")
+            End If
+
+            Dim oFilter As BinaryOperator = New BinaryOperator("besuchsdatum_auswertung", txtDtmFilter, BinaryOperatorType.Equal)
+            colFotos4Pivot.Filter = oFilter
+            Me.dtpRohdaten.Text = "Rohdaten (" & colFotos4Pivot.Count.ToString("#,##0") & ")"
+            Me.dgvFotos2Copy.RefreshData()
+            Me.grdRohdaten.DataSource = colFotos4Pivot
+            txtFolder = String.Format(txtXLSFolder & "Monatsauswertung_Rohdaten_{0}_{1}.xlsx", AuswertungsJahr, AuswertungsMonat.ToString("00"))
+            Me.dpgExport.ExportToXlsx(txtFolder, o)
+            colFilesCreated.Add(txtFolder)
+            AddLogText("File created: " & txtFolder)
+
+        Catch oErr As Exception
+            oLog.Error("ExportPivot", oErr)
+        End Try
+
+    End Sub
     Private Sub Send_Mail(iFotos As Int32)
 
         Try
-            If IsNothing(oMailer) Then
-                oMailer = New Mails
-            End If
 
-            oMailer.From_Adress = "hans-peter.bruns@combera.com"
+            oMailer.To = My.Settings.Mail_Reporting
+            oMailer.CC = "hans-peter.bruns@combera.com"
 
-            If My.Computer.Name.ToLower = "lt-4971" Then
-                oMailer.To_Adresses = "hans-peter.bruns@combera.com"
-            Else
-                oMailer.To_Adresses = My.Settings.Mail_Reporting
-                oMailer.CC_Adresses = "hans-peter.bruns@combera.com"
-            End If
+
 
             Dim oSB As New System.Text.StringBuilder
 
@@ -527,22 +636,74 @@ Public Class frmMain
 
             oSB.AppendLine(String.Format("Es wurden {0:#,##0} Fotos vom München nach Dortmund kopiert.{1}{1}Besuchsdatum von {2:ddd dd.MM.yyyy} bis {3:ddd dd.MM.yyyy}", iFotos, vbCrLf, MinDate, MaxDate))
 
+            oMailer.Attachments.Clear()
+
             If colFilesCreated.Count <> 0 Then
                 oSB.AppendLine("")
 
                 Dim txtFile As String
                 For Each txtFile In colFilesCreated
                     oSB.AppendLine(String.Format("{0} erstellt", txtFile))
-                    oMailer.AddNewAttachment(txtFile)
+                    oMailer.Attachments.Add(txtFile)
                 Next
             End If
             oSB.AppendLine("")
-            oMailer.MailBody = oSB.ToString()
+            oMailer.Body = oSB.ToString()
 
-            If oMailer.Create_Mail() Then
-                oMailer.SendMail()
-            End If
+            'If oMailer.Create_Mail() Then
+            '    oMailer.SendMail()
+            'End If
+
+            oMailer.sendMail()
+
         Catch oErr As Exception
+            oLog.Error("Send_Mail", oErr)
+        End Try
+
+    End Sub
+    Private Sub Send_ZIP_Mail(iFotos As Int32, Monat As Int32, Jahr As Int32)
+
+        Try
+
+            Dim dtmAuswertung As DateTime = Date.Parse("01." & Monat.ToString("00") & "." & Jahr.ToString("0000"))
+
+            oMailer.To = My.Settings.web_foto_zip_mail_recipients
+            oMailer.CC = "hans-peter.bruns@combera.com"
+
+            'oMailerNew.Subject = "Adelholzener Foto ZIP: " & Date.Today.ToShortDateString
+
+            Dim oSB As New StringBuilder
+
+            oSB.AppendLine("Sehr geehrte Damen und Herren")
+            oSB.AppendLine("")
+            oSB.AppendLine("Unter https: //www.combera.com/adelholzener/auswertungen/fotos/ liegen die Fotos für den Monat " & dtmAuswertung.ToString("MMMM yyyy") & "in der Datei '" & Monat.ToString("00") & ".zip' bereit.")
+            oSB.AppendLine("")
+            oSB.AppendLine("Mit freundlichen Grüßen")
+            oSB.AppendLine("Ihr COMBERA IT Team")
+
+
+
+            If colFilesCreated.Count <> 0 Then
+                oSB.AppendLine("")
+
+                Dim txtFile As String
+                For Each txtFile In colFilesCreated
+                    oSB.AppendLine(String.Format("{0} erstellt", txtFile))
+                    'oMailer.AddNewAttachment(txtFile)
+                Next
+            End If
+            oSB.AppendLine("")
+            oMailer.Body = oSB.ToString()
+
+            'If oMailer.Create_Mail() Then
+            '    oMailer.SendMail()
+            'End If
+
+            oMailer.sendMail()
+
+
+        Catch oErr As Exception
+            MsgBox(oErr.Message)
             oLog.Error("Send_Mail", oErr)
         End Try
 
@@ -712,21 +873,33 @@ Public Class frmMain
         tAuswertungsZeitraum = txtDtmFilter
 
         Dim args As New XtraMessageBoxArgs()
-        args.Caption = "Export Pivot"
+        args.Caption = "Zip Fotos"
         args.Text = "Was soll ausgewertet werden?"
         args.Buttons = New DialogResult() {DialogResult.OK, DialogResult.Cancel, DialogResult.Retry}
         AddHandler args.Showing, AddressOf Args_Showing
 
 
         Dim oResult As DialogResult = XtraMessageBox.Show(args)
-
+        Dim iFies As Int32 = 0
         If oResult = DialogResult.Retry Then
             Using oZip As ZipFile = New ZipFile
                 oZip.AddDirectory(txtSrcFolder, "")
                 oZip.Save(txtWebFolder & AuswertungsMonat.ToString("00") & ".zip")
+                iFies = oZip.Count
             End Using
+
+            Send_ZIP_Mail(iFies, AuswertungsMonat, AuswertungsJahr)
             MsgBox(txtWebFolder & AuswertungsMonat.ToString("00") & ".zip created sucessfully!", vbInformation + vbOKOnly, "ZIP files and copy")
+
         End If
 
+    End Sub
+
+    Private Sub bbiExportFilterdPivot_ItemClick(sender As Object, e As XtraBars.ItemClickEventArgs) Handles bbiExportFilterdPivot.ItemClick
+        ExporFilteredtPivot()
+        Dim iFrage As Int32 = MsgBox("Soll die Mail gesendet werden?", vbYesNo)
+        If iFrage = vbYes Then
+            Send_Mail(0)
+        End If
     End Sub
 End Class

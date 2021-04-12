@@ -12,13 +12,28 @@
       <Value Profile="(Default)">\\dmfs04\all\Adelholzener\</Value>
     </Setting>
     <Setting Name="mb_licence" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">MN110-539B64549A169B5F9B3E01B283A3-F80C</Value>
+      <Value Profile="(Default)">MN120-48807FB681BC801280F334FD9C5A-CC76</Value>
     </Setting>
     <Setting Name="DestinationFolder4POSI" Type="System.String" Scope="User">
       <Value Profile="(Default)">\\dmfs01\POS-Sales_Programme\Fotos_Temp\</Value>
     </Setting>
     <Setting Name="web_foto_zip_folder" Type="System.String" Scope="Application">
       <Value Profile="(Default)">\\dmweb03\Adelholzener\Auswertungen\Fotos\</Value>
+    </Setting>
+    <Setting Name="web_foto_zip_mail_recipients" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">christina.jaschowez@combera.com;mario_greif@adelholzener.de</Value>
+    </Setting>
+    <Setting Name="web_foto_zip_mail_recipients_cc" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">christina.jaschowez@combera.com</Value>
+    </Setting>
+    <Setting Name="reports_mail_login" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Svc_reports@combera.com</Value>
+    </Setting>
+    <Setting Name="reports_mail_password" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">shortL!on23</Value>
+    </Setting>
+    <Setting Name="reports_mail_server" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">mail.office365.com</Value>
     </Setting>
   </Settings>
 </SettingsFile>

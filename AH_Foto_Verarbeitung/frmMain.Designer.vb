@@ -47,6 +47,8 @@ Partial Class frmMain
         Me.UdcXLSXExport = New AH_Foto_Verarbeitung.udcXLSX()
         Me.dtpLOG = New DevExpress.XtraBars.Navigation.TabNavigationPage()
         Me.dmeLog = New DevExpress.XtraEditors.MemoEdit()
+        Me.BarButtonItem1 = New DevExpress.XtraBars.BarButtonItem()
+        Me.bbiExportFilterdPivot = New DevExpress.XtraBars.BarButtonItem()
         CType(Me.RibbonControl, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.pgbMain, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.RepositoryItemProgressBar1, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -68,9 +70,9 @@ Partial Class frmMain
         'RibbonControl
         '
         Me.RibbonControl.ExpandCollapseItem.Id = 0
-        Me.RibbonControl.Items.AddRange(New DevExpress.XtraBars.BarItem() {Me.RibbonControl.ExpandCollapseItem, Me.RibbonControl.SearchEditItem, Me.bbiExit, Me.bsiFotos2Copy, Me.pgbMainItem, Me.bbiExportPivot, Me.bbiExportRohdaten, Me.bbiZipFotosAndCopy})
+        Me.RibbonControl.Items.AddRange(New DevExpress.XtraBars.BarItem() {Me.RibbonControl.ExpandCollapseItem, Me.RibbonControl.SearchEditItem, Me.bbiExit, Me.bsiFotos2Copy, Me.pgbMainItem, Me.bbiExportPivot, Me.bbiExportRohdaten, Me.bbiZipFotosAndCopy, Me.bbiExportFilterdPivot})
         Me.RibbonControl.Location = New System.Drawing.Point(0, 0)
-        Me.RibbonControl.MaxItemId = 7
+        Me.RibbonControl.MaxItemId = 8
         Me.RibbonControl.Name = "RibbonControl"
         Me.RibbonControl.Pages.AddRange(New DevExpress.XtraBars.Ribbon.RibbonPage() {Me.drpStart})
         Me.RibbonControl.RepositoryItems.AddRange(New DevExpress.XtraEditors.Repository.RepositoryItem() {Me.RepositoryItemProgressBar1, Me.pgbMain})
@@ -144,6 +146,7 @@ Partial Class frmMain
         'rpgExport
         '
         Me.rpgExport.ItemLinks.Add(Me.bbiExportPivot)
+        Me.rpgExport.ItemLinks.Add(Me.bbiExportFilterdPivot)
         Me.rpgExport.ItemLinks.Add(Me.bbiExportRohdaten)
         Me.rpgExport.Name = "rpgExport"
         Me.rpgExport.Text = "Export"
@@ -208,6 +211,7 @@ Partial Class frmMain
         '
         'dgvFotos2Copy
         '
+        Me.dgvFotos2Copy.FixedLineWidth = 3
         Me.dgvFotos2Copy.GridControl = Me.grdFotos2Copy
         Me.dgvFotos2Copy.Name = "dgvFotos2Copy"
         Me.dgvFotos2Copy.OptionsBehavior.Editable = False
@@ -219,14 +223,14 @@ Partial Class frmMain
         Me.dtpPivotExport.Caption = "Pivot 2 Export"
         Me.dtpPivotExport.Controls.Add(Me.dpgExport)
         Me.dtpPivotExport.Name = "dtpPivotExport"
-        Me.dtpPivotExport.Size = New System.Drawing.Size(1090, 465)
+        Me.dtpPivotExport.Size = New System.Drawing.Size(1090, 461)
         '
         'dpgExport
         '
         Me.dpgExport.Dock = System.Windows.Forms.DockStyle.Fill
         Me.dpgExport.Location = New System.Drawing.Point(0, 0)
         Me.dpgExport.Name = "dpgExport"
-        Me.dpgExport.Size = New System.Drawing.Size(1090, 465)
+        Me.dpgExport.Size = New System.Drawing.Size(1090, 461)
         Me.dpgExport.TabIndex = 5
         '
         'dtpRohdaten
@@ -249,6 +253,7 @@ Partial Class frmMain
         '
         'dgvRohdaten
         '
+        Me.dgvRohdaten.FixedLineWidth = 3
         Me.dgvRohdaten.GridControl = Me.grdRohdaten
         Me.dgvRohdaten.Name = "dgvRohdaten"
         Me.dgvRohdaten.OptionsBehavior.Editable = False
@@ -266,6 +271,7 @@ Partial Class frmMain
         '
         Me.UdcXLSXExport.Dock = System.Windows.Forms.DockStyle.Fill
         Me.UdcXLSXExport.Location = New System.Drawing.Point(0, 0)
+        Me.UdcXLSXExport.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.UdcXLSXExport.Name = "UdcXLSXExport"
         Me.UdcXLSXExport.Size = New System.Drawing.Size(1090, 498)
         Me.UdcXLSXExport.TabIndex = 0
@@ -285,6 +291,22 @@ Partial Class frmMain
         Me.dmeLog.Name = "dmeLog"
         Me.dmeLog.Size = New System.Drawing.Size(1090, 498)
         Me.dmeLog.TabIndex = 0
+        '
+        'BarButtonItem1
+        '
+        Me.BarButtonItem1.Caption = "Export Pivot"
+        Me.BarButtonItem1.Id = 4
+        Me.BarButtonItem1.ImageOptions.Image = CType(resources.GetObject("BarButtonItem1.ImageOptions.Image"), System.Drawing.Image)
+        Me.BarButtonItem1.ImageOptions.LargeImage = CType(resources.GetObject("BarButtonItem1.ImageOptions.LargeImage"), System.Drawing.Image)
+        Me.BarButtonItem1.Name = "BarButtonItem1"
+        '
+        'bbiExportFilterdPivot
+        '
+        Me.bbiExportFilterdPivot.Caption = "Export filtered Pivot"
+        Me.bbiExportFilterdPivot.Id = 7
+        Me.bbiExportFilterdPivot.ImageOptions.Image = CType(resources.GetObject("BarButtonItem2.ImageOptions.Image"), System.Drawing.Image)
+        Me.bbiExportFilterdPivot.ImageOptions.LargeImage = CType(resources.GetObject("BarButtonItem2.ImageOptions.LargeImage"), System.Drawing.Image)
+        Me.bbiExportFilterdPivot.Name = "bbiExportFilterdPivot"
         '
         'frmMain
         '
@@ -348,4 +370,6 @@ Partial Class frmMain
     Friend WithEvents bbiExportRohdaten As DevExpress.XtraBars.BarButtonItem
     Friend WithEvents bbiZipFotosAndCopy As DevExpress.XtraBars.BarButtonItem
     Friend WithEvents rpgFiles As DevExpress.XtraBars.Ribbon.RibbonPageGroup
+    Friend WithEvents bbiExportFilterdPivot As DevExpress.XtraBars.BarButtonItem
+    Friend WithEvents BarButtonItem1 As DevExpress.XtraBars.BarButtonItem
 End Class
