@@ -661,7 +661,7 @@ Public Class frmMain
         End Try
 
     End Sub
-    Private Sub Send_ZIP_Mail(iFotos As Int32, Monat As Int32, Jahr As Int32)
+    Private Function Send_ZIP_Mail(iFotos As Int32, Monat As Int32, Jahr As Int32) As Boolean
 
         Try
 
@@ -669,45 +669,32 @@ Public Class frmMain
 
             oMailer.To = My.Settings.web_foto_zip_mail_recipients
             oMailer.CC = "hans-peter.bruns@combera.com"
+            oMailer.Subject = "Adelholzener Foto-ZIP für den Monat " & dtmAuswertung.ToString("MMMM yyyy")
 
-            'oMailerNew.Subject = "Adelholzener Foto ZIP: " & Date.Today.ToShortDateString
 
             Dim oSB As New StringBuilder
 
             oSB.AppendLine("Sehr geehrte Damen und Herren")
             oSB.AppendLine("")
-            oSB.AppendLine("Unter https: //www.combera.com/adelholzener/auswertungen/fotos/ liegen die Fotos für den Monat " & dtmAuswertung.ToString("MMMM yyyy") & "in der Datei '" & Monat.ToString("00") & ".zip' bereit.")
+            oSB.AppendLine("Unter https: //www.combera.com/adelholzener/auswertungen/fotos/ liegen die Fotos für den Monat " & dtmAuswertung.ToString("MMMM yyyy") & " in der Datei '" & Monat.ToString("00") & ".zip' bereit.")
+            oSB.AppendLine("Es sind " & iFotos.ToString("#,##0") & " Bilder in der Datei enthalten.")
             oSB.AppendLine("")
             oSB.AppendLine("Mit freundlichen Grüßen")
             oSB.AppendLine("Ihr COMBERA IT Team")
-
-
-
-            If colFilesCreated.Count <> 0 Then
-                oSB.AppendLine("")
-
-                Dim txtFile As String
-                For Each txtFile In colFilesCreated
-                    oSB.AppendLine(String.Format("{0} erstellt", txtFile))
-                    'oMailer.AddNewAttachment(txtFile)
-                Next
-            End If
             oSB.AppendLine("")
             oMailer.Body = oSB.ToString()
 
-            'If oMailer.Create_Mail() Then
-            '    oMailer.SendMail()
-            'End If
-
             oMailer.sendMail()
 
+            Return True
 
         Catch oErr As Exception
             MsgBox(oErr.Message)
-            oLog.Error("Send_Mail", oErr)
+            oLog.Error("Send_ZIP_Mail", oErr)
+            Return False
         End Try
 
-    End Sub
+    End Function
     '*****************************************************************************************************************************************************
     'Form Events
     '*****************************************************************************************************************************************************
@@ -888,8 +875,12 @@ Public Class frmMain
                 iFies = oZip.Count
             End Using
 
-            Send_ZIP_Mail(iFies, AuswertungsMonat, AuswertungsJahr)
-            MsgBox(txtWebFolder & AuswertungsMonat.ToString("00") & ".zip created sucessfully!", vbInformation + vbOKOnly, "ZIP files and copy")
+            If Send_ZIP_Mail(iFies, AuswertungsMonat, AuswertungsJahr) Then
+                MsgBox(txtWebFolder & AuswertungsMonat.ToString("00") & ".zip created sucessfully!", vbInformation + vbOKOnly, "ZIP files and copy")
+            Else
+                MsgBox("Someting went wohl wrong :-(", vbExclamation + vbOKOnly, "ZIP files and copy")
+            End If
+
 
         End If
 
